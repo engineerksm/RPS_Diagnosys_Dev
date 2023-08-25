@@ -51,13 +51,13 @@ try:
         # print("Setting frequency to 1.5GHz")
         # vna.cmd(":GEN:FREQ 1500000000")
         print("Frequency sweep data at " + trace_list[0])
-        vna.cmd(":VNA:TRAC:DATA? " + trace_list[0])
-        time.sleep(2)
+        vna.query(":VNA:TRAC:DATA? " + trace_list[0])
+        time.sleep(5)
         # print("Setting frequency to 1.0GHz")
         # vna.cmd(":GEN:FREQ 1000000000")
         print("Frequency sweep data at " + trace_list[1])
-        vna.cmd(":VNA:TRAC:DATA? " + trace_list[1])
-        time.sleep(2)
+        vna.query(":VNA:TRAC:DATA? " + trace_list[1])
+        time.sleep(5)
 
 except KeyboardInterrupt:
     # turn off generator
