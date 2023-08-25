@@ -44,19 +44,19 @@ vna.cmd(":VNA:FREQ:STOP " + stop_freq)
 
 try:
     trace_list = vna.query(":VNA:TRAC:LIST?")
-    print(trace_list)
+    print(trace_list)   # S11, S12, S21, S22
 
     while True:
         time.sleep(2)
         # print("Setting frequency to 1.5GHz")
         # vna.cmd(":GEN:FREQ 1500000000")
         print("Frequency sweep data at " + trace_list[0])
-        vna.query(":VNA:TRAC:DATA? " + trace_list[0])
+        trace_data_s11 = vna.query(":VNA:TRAC:DATA? " + trace_list[0])
         time.sleep(5)
         # print("Setting frequency to 1.0GHz")
         # vna.cmd(":GEN:FREQ 1000000000")
         print("Frequency sweep data at " + trace_list[1])
-        vna.query(":VNA:TRAC:DATA? " + trace_list[1])
+        trace_data_s12 = vna.query(":VNA:TRAC:DATA? " + trace_list[1])
         time.sleep(5)
 
 except KeyboardInterrupt:
