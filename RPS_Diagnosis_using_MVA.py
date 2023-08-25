@@ -9,7 +9,7 @@ from sklearn.cross_decomposition import PLSRegression
 import plotly.express as px
 
 path_List = [
-    r"C:\Users\smkim\PycharmProjects\RF_Diagnosys\CST_SELF\E122NA-01\0. Ignition window"
+    r".\CST_SELF\E122NA-01\0. Ignition window"
   ]
 len(path_List)
 
@@ -85,7 +85,7 @@ pca_1d_df = pca_1d.fit_transform(sc_df)
 df_PcaRes_3d = pd.DataFrame(data=pca_3d_df,
                             columns=['principal_component1', 'principal_component2', 'principal_component3'])
 df_PcaRes_3d.index = Sliced_Data.index
-result_Data_path = r"C:\Users\smkim\PycharmProjects\RF_Diagnosys\Results\RPS_Diagnosys_Results"
+result_Data_path = r".\Results\RPS_Diagnosys_Results"
 df_PcaRes_3d.to_csv(result_Data_path + '_Pca3d_' + file_list[file_idx])
 
 # Calculate the total variance
@@ -113,7 +113,7 @@ fig.show()
 df_PcaRes_2d = pd.DataFrame(data=pca_2d_df,
                             columns=['principal_component1', 'principal_component2'])
 df_PcaRes_2d.index = Sliced_Data.index
-result_Data_path = r"C:\Users\smkim\PycharmProjects\RF_Diagnosys\Results\RPS_Diagnosys_Results"
+result_Data_path = r".\Results\RPS_Diagnosys_Results"
 df_PcaRes_2d.to_csv(result_Data_path + '_Pca2d_' + file_list[file_idx])
 
 # Calculate the total variance
@@ -138,7 +138,7 @@ fig.show()
 df_PcaRes_1d = pd.DataFrame(data=pca_1d_df,
                             columns=['principal_component1'])
 df_PcaRes_1d.index = Sliced_Data.index
-result_Data_path = r"C:\Users\smkim\PycharmProjects\RF_Diagnosys\Results\RPS_Diagnosys_Results"
+result_Data_path = r".\Results\RPS_Diagnosys_Results"
 df_PcaRes_1d.to_csv(result_Data_path + '_Pca1d_' + file_list[file_idx])
 
 # Calculate the total variance
@@ -176,7 +176,7 @@ for featureIdx in range(1, num_of_feature):
     plt.legend()
     plt.xlabel('time')
 
-result_file_save_path = r"C:\Users\smkim\PycharmProjects\RF_Diagnosys\Results\plot_"
+result_file_save_path = r".\Results\plot_"
 img_save_path = result_file_save_path + subTitle + '.png'
 plt.savefig(img_save_path)
 print(img_save_path)
