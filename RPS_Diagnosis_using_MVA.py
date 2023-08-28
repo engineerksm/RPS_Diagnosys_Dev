@@ -7,6 +7,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn import decomposition
 from sklearn.cross_decomposition import PLSRegression
 import plotly.express as px
+import plotly.graph_objects as go
 
 path_List = [
     r".\CST_SELF\E122NA-01\0. Ignition window"
@@ -78,8 +79,6 @@ for idx in range(1, len(Extracted_Params)):
 
 # Fit Data-set to Model
 pca_3d_df = pca_3d.fit_transform(sc_df)
-pca_2d_df = pca_2d.fit_transform(sc_df)
-pca_1d_df = pca_1d.fit_transform(sc_df)
 
 # Save PCA Data to csv format
 df_PcaRes_3d = pd.DataFrame(data=pca_3d_df,
@@ -109,6 +108,9 @@ print("PCA-3D loading effect\n", loadings_3d_df)
 fig = px.scatter(loadings_3d_df, title=f'PCA_3D Loading Effects , RPS test data : {file_list[file_idx]}')
 fig.show()
 
+# Fit Data-set to Model
+pca_2d_df = pca_2d.fit_transform(sc_df)
+
 # Save PCA_2D Data to csv format
 df_PcaRes_2d = pd.DataFrame(data=pca_2d_df,
                             columns=['principal_component1', 'principal_component2'])
@@ -133,6 +135,9 @@ print("PCA-2D loading effect\n", loadings_2d_df)
 # Draw the 2D plot
 fig = px.scatter(loadings_2d_df, title=f'PCA_2D Loading Effects , RPS test data : {file_list[file_idx]}')
 fig.show()
+
+# Fit Data-set to Model
+pca_1d_df = pca_1d.fit_transform(sc_df)
 
 # Save PCA_1D Data to csv format
 df_PcaRes_1d = pd.DataFrame(data=pca_1d_df,
@@ -159,6 +164,7 @@ print("PCA-2D loading effect\n", loadings_1d_df)
 fig = px.scatter(loadings_1d_df, title=f'PCA_1D Loading Effects , RPS test data : {file_list[file_idx]}')
 fig.show()
 
+# Draw EDA Plot
 for featureIdx in range(1, num_of_feature):
     plt.figure(1, figsize=(20, 22))
     subTitle = "Exploratory Data Analysis for RPS test data : " + file_list[file_idx]
@@ -166,7 +172,7 @@ for featureIdx in range(1, num_of_feature):
     axe = plt.subplot(ROW, COL, featureIdx)
     plt.title(idx_col[featureIdx])
 
-    #격자 여백 설정
+    # 격자 여백 설정
     plt.subplots_adjust(wspace=0.3, hspace=1.0)
 
     # for idx in range(0, len(path_List)):
