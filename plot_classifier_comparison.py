@@ -41,7 +41,43 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+from sklearn.utils import _safe_indexing, check_matplotlib_support
+from sklearn.utils.validation import _num_features, check_is_fitted
+from sklearn.preprocessing import LabelEncoder
+from sklearn.base import is_regressor
+from functools import reduce
 # from sklearn.inspection import DecisionBoundaryDisplay
+
+
+def _check_boundary_response_method(estimator, response_method):
+    has_classes = hasattr(estimator, "classes_")
+    # if has_classes and _is_arraylike_not_scalar(estimator.classes_[0]):
+    #     msg = "Multi-label and multi-output multi-class classifiers are not supported"
+    #     raise ValueError(msg)
+
+    if has_classes and len(estimator.classes_) > 2:
+        if response_method not in {"auto", "predict"}:
+            msg = (
+                "Multiclass classifiers are only supported when response_method is"
+                " 'predict' or 'auto'"
+            )
+            raise ValueError(msg)
+        methods_list = ["predict"]
+    elif response_method == "auto":
+        methods_list = ["decision_function", "predict_proba", "predict"]
+    else:
+        methods_list = [response_method]
+
+    prediction_method = [getattr(estimator, method, None) for method in methods_list]
+    prediction_method = reduce(lambda x, y: x or y, prediction_method)
+    if prediction_method is None:
+        raise ValueError(
+            f"{estimator.__class__.__name__} has none of the following attributes: "
+            f"{', '.join(methods_list)}."
+        )
+
+    return prediction_method
+
 
 class DecisionBoundaryDisplay:
     """Decisions boundary visualization.
@@ -106,6 +142,7 @@ class DecisionBoundaryDisplay:
         -------
         display: :class:`~sklearn.inspection.DecisionBoundaryDisplay`
         """
+        check_matplotlib_support("DecisionBoundaryDisplay.plot")
         import matplotlib.pyplot as plt  # noqa
 
         if plot_method not in ("contourf", "contour", "pcolormesh"):
@@ -130,6 +167,96 @@ class DecisionBoundaryDisplay:
         self.figure_ = ax.figure
         return self
 
+    @classmethod
+    def from_estimator(
+        cls,
+        estimator,
+        X,
+        *,
+        grid_resolution=100,
+        eps=1.0,
+        plot_method="contourf",
+        response_method="auto",
+        xlabel=None,
+        ylabel=None,
+        ax=None,
+        **kwargs,
+    ):
+        check_matplotlib_support(f"{cls.__name__}.from_estimator")
+        check_is_fitted(estimator)
+
+        if not grid_resolution > 1:
+            raise ValueError(
+                "grid_resolution must be greater than 1. Got"
+                f" {grid_resolution} instead."
+            )
+
+        if not eps >= 0:
+            raise ValueError(
+                f"eps must be greater than or equal to 0. Got {eps} instead."
+            )
+
+        possible_plot_methods = ("contourf", "contour", "pcolormesh")
+        if plot_method not in possible_plot_methods:
+            available_methods = ", ".join(possible_plot_methods)
+            raise ValueError(
+                f"plot_method must be one of {available_methods}. "
+                f"Got {plot_method} instead."
+            )
+
+        num_features = _num_features(X)
+        if num_features != 2:
+            raise ValueError(
+                f"n_features must be equal to 2. Got {num_features} instead."
+            )
+
+        x0, x1 = _safe_indexing(X, 0, axis=1), _safe_indexing(X, 1, axis=1)
+
+        x0_min, x0_max = x0.min() - eps, x0.max() + eps
+        x1_min, x1_max = x1.min() - eps, x1.max() + eps
+
+        xx0, xx1 = np.meshgrid(
+            np.linspace(x0_min, x0_max, grid_resolution),
+            np.linspace(x1_min, x1_max, grid_resolution),
+        )
+        if hasattr(X, "iloc"):
+            # we need to preserve the feature names and therefore get an empty dataframe
+            X_grid = X.iloc[[], :].copy()
+            X_grid.iloc[:, 0] = xx0.ravel()
+            X_grid.iloc[:, 1] = xx1.ravel()
+        else:
+            X_grid = np.c_[xx0.ravel(), xx1.ravel()]
+
+        pred_func = _check_boundary_response_method(estimator, response_method)
+        response = pred_func(X_grid)
+
+        # convert classes predictions into integers
+        if pred_func.__name__ == "predict" and hasattr(estimator, "classes_"):
+            encoder = LabelEncoder()
+            encoder.classes_ = estimator.classes_
+            response = encoder.transform(response)
+
+        if response.ndim != 1:
+            if is_regressor(estimator):
+                raise ValueError("Multi-output regressors are not supported")
+
+            # TODO: Support pos_label
+            response = response[:, 1]
+
+        if xlabel is None:
+            xlabel = X.columns[0] if hasattr(X, "columns") else ""
+
+        if ylabel is None:
+            ylabel = X.columns[1] if hasattr(X, "columns") else ""
+
+        display = DecisionBoundaryDisplay(
+            xx0=xx0,
+            xx1=xx1,
+            response=response.reshape(xx0.shape),
+            xlabel=xlabel,
+            ylabel=ylabel,
+        )
+        return display.plot(ax=ax, plot_method=plot_method, **kwargs)
 
 # sys.path.append('C:\\Jonathan.Kim_GEN_Dr_Dev\\Jonathan.Kim_GEN_Dr_Dev\\scikit-learn-main\\sklearn')
 # import sklearn.inspection._plot.decision_boundary
@@ -211,14 +338,15 @@ for ds_cnt, ds in enumerate(datasets):
         ax = plt.subplot(len(datasets), len(classifiers) + 1, i)
         clf.fit(X_train, y_train)
         score = clf.score(X_test, y_test)
-        # DecisionBoundaryDisplay.from_estimator(
-        #      clf, X, cmap=cm, alpha=0.8, ax=ax, eps=0.5
-        # )
+        DecisionBoundaryDisplay.from_estimator(
+             clf, X, cmap=cm, alpha=0.8, ax=ax, eps=0.5
+        )
 
         # Plot the training points
         ax.scatter(
             X_train[:, 0], X_train[:, 1], c=y_train, cmap=cm_bright, edgecolors="k"
         )
+
         # Plot the testing points
         ax.scatter(
             X_test[:, 0],

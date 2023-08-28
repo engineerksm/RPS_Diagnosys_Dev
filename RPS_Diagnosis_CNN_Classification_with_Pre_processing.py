@@ -4,19 +4,11 @@ import numpy as np
 import matplotlib.pylab as plt
 
 path_List = [
-    "./CST_SELF/EDGE 10060A-D02_040114356/0. Normal_Case",
-    "./CST_SELF/EDGE 10060A-D02_040114356/1. Agile Rail Threshold",
-    "./CST_SELF/EDGE 10060A-D02_040114356/2. Drive Upper Limit",
-    "./CST_SELF/EDGE 10060A-D02_040114356/3. CIC Filter Decimation",
-    "./CST_SELF/EDGE 10060A-D02_040114356/4. Ambient Air Temp",
-    "./CST_SELF/EDGE 10060A-D02_040114356/5. Heatsink Temp",
-    "./CST_SELF/EDGE 10060A-D02_040114356/IIR_Filter_Coefficient"
+    "./CST_SELF/E122NA-01/1. SRF"
   ]
 len(path_List)
 
-# path_List = ".\CST_SELF/EDGE 10060A-D02_040114356/0. Normal_Case"
-
-npy_path_path = './npy_data/EDGE 10060A-D02_040114356/'
+npy_path_path = './npy_data/E122NA-01/'
 print(npy_path_path)
 
 file_list_csv = []
@@ -35,7 +27,7 @@ Test = 1
 Total = Train + Test
 y_val = 1
 
-idx_col = ['Setpoint','Forward','Reverse','Dissipated','PA Voltage','Drive Setpoint','PA01 Current','Rail Setpoint','Soft Start Volts','VSWR','Heatsink Temp','Ambient Air Temp']
+idx_col = ['Impedance']
 num_of_feature = len(idx_col)
 
 for featureIdx in range(0, num_of_feature):
