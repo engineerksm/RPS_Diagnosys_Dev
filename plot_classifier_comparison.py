@@ -46,6 +46,7 @@ from sklearn.utils.validation import _num_features, check_is_fitted
 from sklearn.preprocessing import LabelEncoder
 from sklearn.base import is_regressor
 from functools import reduce
+import pandas as pd
 # from sklearn.inspection import DecisionBoundaryDisplay
 
 
@@ -263,12 +264,12 @@ class DecisionBoundaryDisplay:
 # from inspection import decision_boundary
 
 names = [
-    "Nearest Neighbors",
-    "Linear SVM",
-    "RBF SVM",
-    "Gaussian Process",
-    "Decision Tree",
-    "Random Forest",
+    # "Nearest Neighbors",
+    # "Linear SVM",
+    # "RBF SVM",
+    # "Gaussian Process",
+    # "Decision Tree",
+    # "Random Forest",
     "Neural Net",
     "AdaBoost",
     "Naive Bayes",
@@ -276,12 +277,12 @@ names = [
 ]
 
 classifiers = [
-    KNeighborsClassifier(3),
-    SVC(kernel="linear", C=0.025),
-    SVC(gamma=2, C=1),
-    GaussianProcessClassifier(1.0 * RBF(1.0)),
-    DecisionTreeClassifier(max_depth=5),
-    RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1),
+    # KNeighborsClassifier(3),
+    # SVC(kernel="linear", C=0.025),
+    # SVC(gamma=2, C=1),
+    # GaussianProcessClassifier(1.0 * RBF(1.0)),
+    # DecisionTreeClassifier(max_depth=5),
+    # RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1),
     MLPClassifier(alpha=1, max_iter=1000),
     AdaBoostClassifier(),
     GaussianNB(),
@@ -296,8 +297,26 @@ X += 2 * rng.uniform(size=X.shape)
 linearly_separable = (X, y)
 
 datasets = [
-    make_moons(noise=0.3, random_state=0),
-    make_circles(noise=0.2, factor=0.5, random_state=1),
+    # make_moons(noise=0.3, random_state=0),
+    # make_circles(noise=0.2, factor=0.5, random_state=1),
+    linearly_separable,
+]
+
+filePath = "./CST_SELF/E122NA-01/1. SRF/DataSet/0. Normal_Case/SRF_Dataset_normal.csv"
+raw = pd.read_csv(filePath)
+X = raw.values.tolist()
+y = np.ones(np.shape(X)[0]).tolist()
+linearly_separable = (X, y)
+
+filePath = "./CST_SELF/E122NA-01/1. SRF/DataSet/1. Abnormal_Case/SRF_Dataset_fault.csv"
+raw2 = pd.read_csv(filePath)
+X2 = raw2.values.tolist()
+y2 = np.zeros(np.shape(X2)[0]).tolist()
+X += X2
+y += y2
+linearly_separable = (X, y)
+
+datasets = [
     linearly_separable,
 ]
 
